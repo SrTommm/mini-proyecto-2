@@ -64,11 +64,38 @@ PUNTOS = {
 # ============================================================
 
 def evaluar_jornada(puntos_seleccionados, puntos):
+    for i in puntos_seleccionados:
+        x = PUNTOS[i]["papel_carton"]
+    
+    
+    #Cantidad de residuo por tipo
+    cant_carton = sum([ PUNTOS[puntos_seleccionados[i]]["papel_carton"] for i in range(len(puntos_seleccionados))])
+    cant_plasticos = sum([ PUNTOS[puntos_seleccionados[i]]["plastico"] for i in range(len(puntos_seleccionados))])
+    cant_vidrio = sum([ PUNTOS[puntos_seleccionados[i]]["vidrio"] for i in range(len(puntos_seleccionados))])
+    cant_organico = sum([ PUNTOS[puntos_seleccionados[i]]["organicos"] for i in range(len(puntos_seleccionados))])
+    cant_NoAprovechable = sum([ PUNTOS[puntos_seleccionados[i]]["no_aprovechables"] for i in range(len(puntos_seleccionados))])
+   
+    peso_por_tipo = {"papel_carton": cant_carton,
+                      "plastico" :cant_plasticos,
+                      "vidrio": cant_vidrio,
+                      "organicos":cant_organico,
+                        "no_aprovechables" : cant_NoAprovechable}
+    
+    #Peso total
+
+    peso_total = sum([peso_por_tipo[i] for i in range(len(peso_por_tipo))])
+
+    
+    costo_transporte = len(puntos_seleccionados) * 45000
+
+    costo_tratamiento = sum([cant_carton*500, ])
+
+
     """
     Debe calcular:
-    - Cantidad de residuos por tipo.
-    - Peso total de residuos.
-    - Costo total de tratamiento.
+    - Cantidad de residuos por tipo. (X)
+    - Peso total de residuos. (X)
+    - Costo total de tratamiento. 
     - Costo de transporte.
     - Costo total de la jornada.
     - Porcentaje de capacidad utilizada.
