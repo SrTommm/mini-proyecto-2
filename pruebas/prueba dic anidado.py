@@ -34,8 +34,10 @@ cant_carton = sum([ PUNTOS[x[i]]["papel_carton"] for i in range(len(x))])
 
 print(cant_carton)
 
+"""
 cant_carton = sum([ PUNTOS[puntos_seleccionados[i]]["papel_carton"] for i in range(len(puntos_seleccionados))])
 cant_plasticos = sum([ PUNTOS[puntos_seleccionados[i]]["plastico"] for i in range(len(puntos_seleccionados))])
 cant_vidrio = sum([ PUNTOS[puntos_seleccionados[i]]["vidrio"] for i in range(len(puntos_seleccionados))])
 cant_organico = sum([ PUNTOS[puntos_seleccionados[i]]["organicos"] for i in range(len(puntos_seleccionados))])
 cant_NoAprovechable = sum([ PUNTOS[puntos_seleccionados[i]]["no_aprovechables"] for i in range(len(puntos_seleccionados))])
+"""

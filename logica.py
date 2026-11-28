@@ -64,45 +64,77 @@ PUNTOS = {
 # ============================================================
 
 def evaluar_jornada(puntos_seleccionados, puntos):
-    for i in puntos_seleccionados:
-        x = PUNTOS[i]["papel_carton"]
-    
-    
+
     #Cantidad de residuo por tipo
-    cant_carton = sum([ PUNTOS[puntos_seleccionados[i]]["papel_carton"] for i in range(len(puntos_seleccionados))])
-    cant_plasticos = sum([ PUNTOS[puntos_seleccionados[i]]["plastico"] for i in range(len(puntos_seleccionados))])
-    cant_vidrio = sum([ PUNTOS[puntos_seleccionados[i]]["vidrio"] for i in range(len(puntos_seleccionados))])
-    cant_organico = sum([ PUNTOS[puntos_seleccionados[i]]["organicos"] for i in range(len(puntos_seleccionados))])
-    cant_NoAprovechable = sum([ PUNTOS[puntos_seleccionados[i]]["no_aprovechables"] for i in range(len(puntos_seleccionados))])
+    # cant_elemento = sum([ PUNTOS[puntos_seleccionados[i]]["elemento"] for i in range(len(puntos_seleccionados))])
+    #
    
-    peso_por_tipo = {"papel_carton": cant_carton,
-                      "plastico" :cant_plasticos,
-                      "vidrio": cant_vidrio,
-                      "organicos":cant_organico,
-                        "no_aprovechables" : cant_NoAprovechable}
+    peso_por_tipo = {"papel_carton": sum([ PUNTOS[puntos_seleccionados[i]]["papel_carton"] for i in range(len(puntos_seleccionados))]),
+                      "plastico" :sum([ PUNTOS[puntos_seleccionados[i]]["plastico"] for i in range(len(puntos_seleccionados))]),
+                      "vidrio": sum([ PUNTOS[puntos_seleccionados[i]]["vidrio"] for i in range(len(puntos_seleccionados))]),
+                      "organicos":sum([ PUNTOS[puntos_seleccionados[i]]["organicos"] for i in range(len(puntos_seleccionados))]),
+                        "no_aprovechables" :sum([ PUNTOS[puntos_seleccionados[i]]["no_aprovechables"] for i in range(len(puntos_seleccionados))])}
     
-    #Peso total
+    #Peso total -> sumamos cada peso registrado en el diccionario que guarda los pesos
 
     peso_total = sum([peso_por_tipo[i] for i in range(len(peso_por_tipo))])
 
-    
-    costo_transporte = len(puntos_seleccionados) * 45000
+    #costos -> 
+    costo_transporte = len(puntos_seleccionados) * COSTO_TRANSPORTE_POR_PUNTO #la cantidad de puntos que visitamos lo multiplicamos por el costo de viaje por punto
 
-    costo_tratamiento = sum([cant_carton*500, ])
+    costo_tramiento = sum([peso_por_tipo[i] * COSTOS_TRATAMIENTO[i] for i in peso_por_tipo]) # sumatoria de: el peso * el costo de tratamiento por kg
+
+    costo_jornada = costo_tramiento + costo_transporte # La suma de todos los costos
+
+    #porcentaje - parte / total) * 100
+    porcentaje_capacidad_usada = (peso_total / CAPACIDAD_MAXIMA) *100
+
+    #porcentaje aprovechamiento 
+    cant_residuos_aprovechables = sum(peso_por_tipo[i] for i in peso_por_tipo if i != "no_aprovechables")
+    porcentaje_aprovechamiento = (cant_residuos_aprovechables/160) * 100
+
+    #validacion restricciones
+    viabilidad = True #Por defecto es viable, y luego podria cambiar
+    restriccion_incumplidas = None
+    if peso_total > 160:
+        viabilidad = False
+        restriccion_incumplidas["peso_total"] = peso_total
+    if costo_jornada > 305000: 
+        viabilidad = False
+        restriccion_incumplidas["costo_total"] = costo_jornada
 
 
+     #Puntos -> Agrega a una lista los puntos seleccionados
+
+     
+    puntos = [i for i in puntos_seleccionados]
+        # Revisa por separado cada codicion para agregar la que no se cumple a un diccionario
+    jornada = {
+            "id" : None,
+            "cantidades_por_tipo": peso_por_tipo, 
+            "peso_total": peso_total,
+            "costo_tratamiento":costo_tramiento ,
+            "costo_transporte": costo_transporte,
+            "costo_total": costo_jornada,
+            "porcentaje_capacidad": porcentaje_capacidad_usada,
+            "porcentaje_aprovechamiento": porcentaje_aprovechamiento,
+            "viable": viabilidad,
+            "restricciones_incumplidas": restriccion_incumplidas ,
+
+               }
+    return jornada
     """
     Debe calcular:
     - Cantidad de residuos por tipo. (X)
     - Peso total de residuos. (X)
-    - Costo total de tratamiento. 
-    - Costo de transporte.
-    - Costo total de la jornada.
-    - Porcentaje de capacidad utilizada.
-    - Porcentaje de aprovechamiento potencial.
-    - Cumplimiento de las restricciones de capacidad y presupuesto.
+    - Costo total de tratamiento.  (X)
+    - Costo de transporte. (X)
+    - Costo total de la jornada. (x)
+    - Porcentaje de capacidad utilizada. (X)
+    - Porcentaje de aprovechamiento potencial. (X)
+    - Cumplimiento de las restricciones de capacidad y presupuesto. (x)
 
-    Retorna un diccionario con las claves indicadas en la plantilla.
+    Retorna un diccionario con las claves indicadas en la plantilla. (X)
     La jornada debe evaluarse incluso si incumple las restricciones.
     """
     raise NotImplementedError("Pendiente implementar evaluar_jornada().")
@@ -113,6 +145,14 @@ def evaluar_jornada(puntos_seleccionados, puntos):
 # ============================================================
 
 def registrar_jornada(jornada, historial):
+
+    #Contar cuantos elementos historial y asignarle el el proximo numero en el id de la jornada
+    id = len(historial) + 1
+    jornada["id"] = id
+
+
+    return jornada
+
     """
     Debe asignar un identificador único a la jornada y agregarla
     al historial.
